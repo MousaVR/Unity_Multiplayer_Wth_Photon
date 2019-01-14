@@ -5,7 +5,7 @@ using Photon.Pun;
 
 namespace VRapeutic.CerebralPalsy
 {
-    public class PlayerManager : MonoBehaviourPunCallbacks
+    public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         #region Public Fields
         [Tooltip ("The current Health of our player")]
@@ -26,7 +26,7 @@ namespace VRapeutic.CerebralPalsy
         }
         void Update()
         {
-            ProcessInputs();
+            if (photonView.IsMine &&PhotonNetwork.IsConnected==true)ProcessInputs();
             if (beams != null && isFiring != beams.activeSelf)
             beams.SetActive(isFiring); 
         }
@@ -66,6 +66,17 @@ namespace VRapeutic.CerebralPalsy
                 GameManager.Instance.LeaveRoom();
             }
         }
+        #endregion
+
+        #region IPunObservable implementation
+        public  void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)//we append our IsFiring value to the stream of data
+                stream.SendNext(isFiring);
+            else
+                this.isFiring =(bool)stream.ReceiveNext();
+        }
+
         #endregion
     }
 }
