@@ -10,8 +10,11 @@ namespace VRapeutic.CerebralPalsy
         #region Public Fields
         [Tooltip ("The current Health of our player")]
         public float Health=1f;
+        //for instaniate players
+        [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
+        public static GameObject LocalPlayerInstance;
         #endregion
-        
+
         #region Private Fields
         [Tooltip("The Beams GameObject To control")]
         [SerializeField] GameObject beams;
@@ -21,9 +24,18 @@ namespace VRapeutic.CerebralPalsy
         #region MonoBehaviour CallBacks
         void Awake()
         {
+            // used in GameManager.cs: we keep track of the localPlayer instance to prevent instantiation when levels are synchronized
+            if (photonView.IsMine) PlayerManager.LocalPlayerInstance = this.gameObject;
+            DontDestroyOnLoad(this.gameObject);
             if (beams == null) Debug.LogError("<Color=Red>Missing</Color> Beams Reference.");
             else beams.SetActive(false);
         }
+        void Start()
+        {
+            //control camera over players
+            
+        }
+
         void Update()
         {
             if (photonView.IsMine &&PhotonNetwork.IsConnected==true)ProcessInputs();
