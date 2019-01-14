@@ -72,9 +72,15 @@ namespace VRapeutic.CerebralPalsy
         public  void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             if (stream.IsWriting)//we append our IsFiring value to the stream of data
+            {
                 stream.SendNext(isFiring);
+                stream.SendNext(Health);
+            }
             else
-                this.isFiring =(bool)stream.ReceiveNext();
+            {
+                this.isFiring = (bool)stream.ReceiveNext();
+                this.Health = (float)stream.ReceiveNext();
+            }
         }
 
         #endregion
